@@ -1,5 +1,7 @@
 require("dotenv").config();
 const db = require("./db");
+const fs = require("fs");
+const path = require("path");
 const { hashPassword } = require("./auth");
 
 (async()=>{
@@ -18,6 +20,20 @@ const { hashPassword } = require("./auth");
   ];
   for(const x of products){
     db.prepare(`INSERT OR IGNORE INTO products(slug,title,description,category,software,version,type,price_cents) VALUES(?,?,?,?,?,?,?,?)`).run(...x);
+  }
+  // Auto-link tracked assets in storage/assets to products so Render can serve
+  // files committed to GitHub even when the product was seeded without an upload.
+  const assetDir = path.join(__dirname, "storage", "assets");
+  const files = fs.existsSync(assetDir) ? fs.readdirSync(assetDir) : [];
+  const mappings = [
+    { slug: "ps-hover-scale-toolkit", match: "PS_Universal_Hover_Scale_Toolkit_V3_2_STABLE" },
+    { slug: "ps-countdown-kit", match: "PS_Countdown_Kit_V15_RESIZABLE_HOVER_STYLE" }
+  ];
+  for (const { slug, match } of mappings) {
+    const filename = files.find(name => name.toLowerCase().includes(match.toLowerCase()));
+    if (!filename) continue;
+    const filePath = path.resolve(assetDir, filename);
+    db.prepare("UPDATE products SET file_name=?, file_path=? WHERE slug=?").run(filename, filePath, slug);
   }
   console.log("PS Creative Hub V7 seed complete. Admin:",adminEmail);
 })();
