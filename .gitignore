@@ -5,7 +5,6 @@ public/uploads/*
 !public/uploads/.gitkeep
 .DS_Store
 .env
-/storage/
 /public/uploads/
 /data/*.db
 /data/*.db-*
