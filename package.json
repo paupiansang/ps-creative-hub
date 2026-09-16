@@ -2,10 +2,10 @@
   "name": "ps-creative-hub",
   "version": "7.0.0",
   "private": true,
-  "description": "PS Creative Hub V7 - complete local marketplace test flow with product management and test checkout",
+  "description": "PS Creative Hub V7 - KBZ Pay manual premium membership with payment verification and product management",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node seed.js && node server.js",
     "dev": "node --watch server.js",
     "seed": "node seed.js"
   },

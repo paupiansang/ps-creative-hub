@@ -24,3 +24,7 @@ The first run creates the admin account from `.env`. Change the demo password be
 
 ## Important production note
 This manual payment version does not automatically verify bank/KPay transactions. **Admin verification is required.** For a real public launch, use a persistent production database and persistent/object storage for uploaded product files and payment screenshots.
+
+
+## Render / Public Store seed
+The start command seeds the admin account and starter products before starting the server, so a fresh deployment has products available.
