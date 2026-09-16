@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="my">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Premium Membership — PS Creative Hub</title>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="premium-body">
+<header class="nav"><a class="brand" href="/"><span class="brand-mark">PS</span><span>Creative Hub</span></a><div class="nav-actions"><a class="ghost-btn" href="/">Home</a></div></header>
+<main class="premium-page">
+  <div class="premium-head">
+    <div class="eyebrow">PS PREMIUM MEMBERSHIP</div>
+    <h1>Premium ဝယ်ယူခြင်း</h1>
+    <p>KBZ Pay ဖြင့် ငွေပေးချေပြီး Transaction ID နှင့် Screenshot တင်ပေးပါ။ Admin မှ စစ်ဆေးပြီးနောက် Premium access ကို ဖွင့်ပေးပါမည်။</p>
+  </div>
+  <div id="premiumStatus" class="premium-status hidden"></div>
+  <div class="premium-grid">
+    <section class="premium-card">
+      <div class="step-head"><span>01</span><div><h2>Package ရွေးပါ</h2><p>Premium အသုံးပြုမည့်ကာလကို ရွေးချယ်ပါ။</p></div></div>
+      <div id="plans" class="plan-list"></div>
+    </section>
+    <section class="premium-card">
+      <div class="step-head"><span>02</span><div><h2>KBZ Pay ဖြင့် ငွေလွှဲပါ</h2><p>အောက်ပါ KBZ Pay အကောင့်သို့ ရွေးထားသော ပမာဏအတိုင်း ငွေလွှဲပေးပါ။</p></div></div>
+      <div class="kpay-box"><div class="kpay-icon">K</div><div><strong>KBZ Pay</strong><b id="accountName">PaugPyinSang</b><em id="accountPhone">0897185588</em></div><button id="copyPhone" class="icon-btn" type="button" title="Copy number">⧉</button></div>
+      <div class="pay-note">ငွေလွှဲပြီးပါက Step 03 တွင် Transaction ID နှင့် ငွေလွှဲ Screenshot ကို တင်ပေးပါ။</div>
+      <div class="step-head step-three"><span>03</span><div><h2>ငွေလွှဲအထောက်အထား တင်ပါ</h2><p>Transaction ID နှင့် ငွေလွှဲ Screenshot လိုအပ်ပါသည်။</p></div></div>
+      <form id="paymentForm">
+        <label>Transaction No/ID (ငွေလွှဲလုပ်ဆောင်မှုအမှတ် / လုပ်ငန်းစဉ်အမှတ်)<input id="transactionId" name="transaction_id" type="text" inputmode="numeric" autocomplete="off" maxlength="6" pattern="[0-9]{6}" required placeholder="အမှတ်စဉ်ရဲ့ နောက်ဆုံးဂဏန်း (၆) လုံးကို ကြည့်ပါ။ ဥပမာ - 549771"></label>
+        <label class="proof-drop"><input id="screenshot" name="screenshot" type="file" accept="image/png,image/jpeg,image/webp" required><strong>📷 Screenshot ရွေးပါ</strong><small id="fileName">JPG / PNG / WEBP — 10MB အောက်</small></label>
+        <button id="submitBtn" class="primary-btn large" type="submit">ငွေလွှဲအထောက်အထား တင်မည်</button>
+        <p id="formMsg" class="form-msg"></p>
+      </form>
+    </section>
+  </div>
+  <p class="premium-foot">Payment proof ကို Admin က စစ်ဆေးပြီး Approve လုပ်ပေးပါမည်။ Approval ပြီးသည်နှင့် Premium assets အားလုံးကို Download လုပ်နိုင်ပါမည်။</p>
+</main>
+<script src="/js/premium.js"></script>
+</body>
+</html>

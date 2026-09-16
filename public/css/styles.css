@@ -11,3 +11,66 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 
 .test-banner{margin:16px 0 22px;padding:12px 14px;border:1px solid #e4e5ef;border-radius:14px;background:#f7f7ff;color:#555b79;font-size:14px}
 .status-ok{display:inline-flex;align-items:center;gap:6px}.status-warn{color:#b57600}.edit-files{margin:12px 0;padding:12px 14px;border:1px dashed #dfe1ee;border-radius:14px;font-size:14px;line-height:1.7}
+
+/* PS Premium — responsive manual KBZ Pay membership */
+.premium-body{background:#0b0c15;color:#fff;min-height:100vh}.premium-body .nav{background:rgba(11,12,21,.9);border-color:rgba(255,255,255,.1)}.premium-body .brand{color:#fff}.premium-body .brand-mark{background:#fff;color:#0b0c15}.premium-body .ghost-btn{background:#171823;color:#fff;border-color:#30313d}.premium-page{max-width:1180px;margin:0 auto;padding:76px 28px 70px}.premium-head{max-width:760px;margin-bottom:38px}.premium-head h1{font-size:clamp(44px,6vw,74px);letter-spacing:-4px;line-height:.95;margin:0 0 18px}.premium-head p{color:#a9abb8;line-height:1.85;font-size:14px}.premium-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.premium-card{background:#14151d;border:1px solid #2c2d38;border-radius:24px;padding:25px}.step-head{display:flex;gap:13px;align-items:flex-start;margin-bottom:20px}.step-head>span{width:42px;height:42px;border-radius:12px;background:#242535;color:#8b8cff;display:grid;place-items:center;font-weight:850;flex:0 0 auto}.step-head h2{font-size:18px;margin:1px 0 4px}.step-head p{margin:0;color:#9294a2;font-size:12px;line-height:1.55}.plan-list{display:grid;gap:10px}.plan{width:100%;border:1px solid #343541;background:#101118;color:#fff;border-radius:16px;padding:16px 15px;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer}.plan.selected{border-color:#6869f9;background:linear-gradient(135deg,#32218e,#2726a9);box-shadow:0 12px 35px rgba(104,105,249,.18)}.plan .radio{width:28px;height:28px;border-radius:50%;border:2px solid #ddd;display:grid;place-items:center;flex:0 0 auto}.plan.selected .radio{border-color:#fff;background:#fff;color:#6869f9}.plan-copy{display:grid;gap:4px;flex:1}.plan-copy strong{font-size:15px}.plan-copy small{color:#9b9daa;font-size:11px}.plan.selected .plan-copy small{color:#d0d0ff}.plan>b{font-size:15px;color:#ffd64d;white-space:nowrap}.plan.selected>b{color:#fff}.kpay-box{display:flex;align-items:center;gap:14px;padding:18px;border:1px solid #3a3b49;background:#1a1b25;border-radius:17px}.kpay-icon{width:54px;height:54px;border-radius:14px;background:#1681ff;color:#fff;display:grid;place-items:center;font-size:24px;font-weight:900}.kpay-box>div:nth-child(2){display:grid;gap:3px;flex:1}.kpay-box strong{font-size:16px}.kpay-box b{font-size:13px;color:#b7b8c4}.kpay-box em{font-style:normal;font-weight:850;color:#16c76a;letter-spacing:.5px}.kpay-box .icon-btn{background:#252634;color:#fff;border-color:#41424f}.pay-note{margin:14px 0 26px;padding:13px 14px;border-radius:12px;background:#1a1b25;color:#9ea0ae;font-size:12px;line-height:1.7}.step-three{margin-top:4px}.premium-card label{display:grid;gap:7px;color:#a8a9b5;font-size:11px;margin-bottom:12px}.premium-card input{width:100%;min-width:0;border:1px solid #363743;border-radius:12px;background:#101118;color:#fff;padding:13px 14px;outline:0}.premium-card input:focus{border-color:#6869f9}.proof-drop{min-height:125px;border:1px dashed #555666;border-radius:15px;padding:18px;place-items:center;text-align:center;cursor:pointer;background:#101118}.proof-drop input{display:none}.proof-drop strong{font-size:14px;color:#fff}.proof-drop small{color:#7f818e}.premium-card .primary-btn{width:100%;margin-top:6px}.form-msg{min-height:20px;color:#9b9daa;font-size:12px;line-height:1.6}.premium-status{display:flex;align-items:center;gap:15px;flex-wrap:wrap;padding:14px 16px;border:1px solid #35364a;background:#171827;border-radius:14px;margin-bottom:20px}.premium-status strong{color:#8b8cff}.premium-status span{color:#aaa;flex:1}.premium-foot{text-align:center;color:#777988;font-size:11px;line-height:1.8;margin:25px auto 0;max-width:760px}
+@media(max-width:800px){.premium-page{padding:55px 18px}.premium-grid{grid-template-columns:1fr}.premium-head h1{letter-spacing:-3px}.premium-card{padding:20px}.plan>b{font-size:14px}}
+@media(max-width:480px){.premium-page{padding:40px 12px}.premium-card{border-radius:18px;padding:16px}.premium-head h1{font-size:43px}.premium-head p{font-size:13px}.plan{padding:14px 12px}.plan-copy strong{font-size:14px}.kpay-box{padding:14px}.kpay-icon{width:48px;height:48px}.premium-body .nav{padding-left:15px;padding-right:15px}.premium-body .nav .brand>span:last-child{font-size:14px}}
+.payment-panel{margin:0 0 18px}.payment-request{display:flex;justify-content:space-between;gap:18px;padding:16px 0;border-bottom:1px solid var(--line)}.payment-request:last-child{border-bottom:0}.payment-main{min-width:0}.payment-top{display:flex;align-items:center;gap:9px;margin-bottom:5px}.payment-top strong{font-size:14px}.payment-request small{color:var(--muted);font-size:11px}.payment-tx{margin:9px 0;font-size:12px}.payment-status{padding:5px 8px;border-radius:999px;font-size:9px;text-transform:uppercase;font-weight:850}.payment-status.pending{background:#fff3d6;color:#a66d00}.payment-status.approved{background:#e9f9ef;color:#18864a}.payment-status.rejected{background:#fff0f2;color:#bd3c52}.proof-link{color:var(--accent);font-size:11px;font-weight:750}.payment-actions{display:flex;align-items:center;gap:7px;flex-shrink:0}.primary-btn.small{padding:8px 11px;font-size:11px}.payment-request.rejected,.payment-request.approved{opacity:.72}
+@media(max-width:650px){.payment-request{flex-direction:column}.payment-actions{width:100%}.payment-actions button{flex:1}.admin-page .panel{padding:16px}}
+
+
+/* PS Premium v3 — polished Burmese + mobile/desktop layout */
+.premium-body{overflow-x:hidden}
+.premium-body,.premium-body button,.premium-body input,.premium-body textarea{font-family:"Noto Sans Myanmar","Myanmar Text",Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+.premium-page{width:100%;overflow:hidden}
+.premium-head h1{font-family:"Noto Sans Myanmar","Myanmar Text",Inter,ui-sans-serif,system-ui,sans-serif;font-size:clamp(40px,5.3vw,68px);line-height:1.18;letter-spacing:-2.5px;overflow-wrap:anywhere}
+.premium-head p,.step-head p,.pay-note,.premium-card label,.premium-foot{font-family:"Noto Sans Myanmar","Myanmar Text",Inter,ui-sans-serif,system-ui,sans-serif}
+.premium-head p{max-width:720px;margin-top:0}
+.kpay-box{min-width:0}
+.kpay-box>div:nth-child(2){min-width:0}
+.kpay-box b,.kpay-box em{overflow-wrap:anywhere}
+.premium-card input{font-family:"Noto Sans Myanmar","Myanmar Text",Inter,ui-sans-serif,system-ui,sans-serif;font-size:14px}
+.premium-card input::placeholder{color:#777988;opacity:1}
+.proof-drop{font-family:"Noto Sans Myanmar","Myanmar Text",Inter,ui-sans-serif,system-ui,sans-serif}
+#submitBtn{font-family:Inter,"Noto Sans Myanmar","Myanmar Text",sans-serif;font-weight:800}
+@media(max-width:800px){
+ .premium-page{padding:42px 16px 56px}
+ .premium-head{margin-bottom:24px}
+ .premium-head h1{font-size:clamp(34px,10vw,52px);line-height:1.22;letter-spacing:-1.8px;margin-bottom:14px}
+ .premium-head p{font-size:13px;line-height:1.85}
+ .premium-grid{grid-template-columns:1fr;gap:14px}
+ .premium-card{padding:18px;border-radius:20px}
+ .step-head{gap:10px;margin-bottom:16px}
+ .step-head>span{width:38px;height:38px;border-radius:11px}
+ .step-head h2{font-size:17px;line-height:1.45}
+ .step-head p{font-size:12px;line-height:1.75}
+ .plan-list{gap:8px}
+ .plan{padding:14px 12px;gap:10px;border-radius:14px}
+ .plan-copy strong{font-size:14px}
+ .plan-copy small{font-size:11px}
+ .plan>b{font-size:14px}
+ .kpay-box{padding:14px;gap:11px}
+ .kpay-icon{width:46px;height:46px;font-size:21px}
+ .kpay-box strong{font-size:15px}
+ .kpay-box b,.kpay-box em{font-size:12px}
+ .pay-note{font-size:12px;line-height:1.8;margin:12px 0 22px}
+ .premium-card label{font-size:11px;line-height:1.7}
+ .premium-card input{padding:14px 12px;min-height:48px}
+ .proof-drop{min-height:112px}
+ .premium-card .primary-btn.large{min-height:50px}
+}
+@media(max-width:480px){
+ .premium-body .nav{height:64px;padding:0 12px}
+ .premium-body .nav .brand-mark{width:32px;height:32px}
+ .premium-body .nav .brand>span:last-child{font-size:14px}
+ .premium-body .nav .ghost-btn{padding:8px 11px;font-size:12px}
+ .premium-page{padding:32px 12px 48px}
+ .premium-head h1{font-size:36px;line-height:1.25;letter-spacing:-1px}
+ .premium-head p{font-size:12.5px}
+ .premium-card{padding:15px;border-radius:18px}
+ .plan>b{font-size:13px}
+ .kpay-box{padding:12px}
+ .kpay-box .icon-btn{width:34px;height:34px;font-size:16px}
+ .pay-note{padding:11px 12px}
+}

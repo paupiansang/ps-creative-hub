@@ -11,11 +11,11 @@ async function run(){
  <div class="eyebrow">${esc(p.category)} • ${esc(p.software||'ASSET')}</div><h1>${esc(p.title)}</h1>
  <p>${esc(p.description||'Creative asset by PS.')}</p>
  <div class="detail-meta"><span class="tag ${premium?'premium':''}">${premium?'Premium':'Free'}</span><span class="pill">${esc(p.version||'Latest')}</span><span class="pill">${p.download_count} downloads</span></div>
- <div class="detail-price">${premium?'RM '+(p.price_cents/100).toFixed(2):'Free'}</div>
- <button id="action" class="primary-btn large">${premium?'Purchase & unlock':'Download free'}</button>
- <p class="muted" style="margin-top:18px">${premium?'After checkout, the file becomes available in My Library.':'No purchase required. The download starts immediately when a file is available.'}</p>
+ <div class="detail-price">${premium?'Premium Membership':'Free'}</div>
+ <button id="action" class="primary-btn large">${premium?'Get Premium Access':'Download free'}</button>
+ <p class="muted" style="margin-top:18px">${premium?'Premium access starts from 10,000 MMK / month.':'No purchase required. The download starts immediately when a file is available.'}</p>
  </div>`;
- $('#action').addEventListener('click',()=>premium?buy(p.id):download(p.id));
+ $('#action').addEventListener('click',()=>premium?location.href='/premium.html?product='+encodeURIComponent(p.slug):download(p.id));
 }
 async function download(id){
  const r=await fetch('/api/products/'+id+'/download',{redirect:'manual'});

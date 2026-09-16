@@ -13,8 +13,10 @@ const PORT = Number(process.env.PORT || 3000);
 const publicDir = path.join(__dirname, 'public');
 const assetDir = path.resolve(process.env.UPLOAD_DIR || path.join(__dirname, 'storage', 'assets'));
 const mediaDir = path.resolve(process.env.MEDIA_DIR || path.join(publicDir, 'uploads', 'media'));
+const proofDir = path.resolve(process.env.PROOF_DIR || path.join(publicDir, 'uploads', 'proofs'));
 fs.mkdirSync(assetDir, { recursive: true });
 fs.mkdirSync(mediaDir, { recursive: true });
+fs.mkdirSync(proofDir, { recursive: true });
 
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const storage = multer.diskStorage({
@@ -25,6 +27,15 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage, limits: { fileSize: 1024 * 1024 * 1024 } });
+const proofUpload = multer({ storage: multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, proofDir),
+  filename: (_req, file, cb) => {
+    const safe = path.basename(file.originalname).replace(/[^a-zA-Z0-9._-]+/g, '_');
+    cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safe}`);
+  }
+}), limits: { fileSize: 10 * 1024 * 1024 }, fileFilter: (_req, file, cb) => {
+  cb(null, /^image\/(png|jpe?g|webp)$/i.test(file.mimetype));
+}});
 
 app.use(cookieParser());
 app.use(express.json({ limit: '4mb' }));
@@ -48,6 +59,11 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 });
 
 app.use(express.static(publicDir));
+
+// Explicit page routes: do not let the SPA fallback send home.html for admin.
+// This keeps /admin stable on desktop, mobile, and direct-link visits.
+app.get('/admin', (_req, res) => res.sendFile(path.join(publicDir, 'admin.html')));
+app.get('/admin/', (_req, res) => res.sendFile(path.join(publicDir, 'admin.html')));
 
 const safeUser = u => ({ id: u.id, email: u.email, name: u.name, role: u.role });
 const sessionCookie = (res, user) => res.cookie('ps_token', signUser(user), {
@@ -105,8 +121,13 @@ app.get('/api/products/:slug', (req, res) => {
 });
 
 app.get('/api/library', requireAuth, (req, res) => {
-  const products = db.prepare(`SELECT p.id,p.slug,p.title,p.description,p.category,p.software,p.version,p.type,p.price_cents,p.thumbnail,p.preview,p.download_count,pu.created_at purchased_at FROM purchases pu JOIN products p ON p.id=pu.product_id WHERE pu.user_id=? AND pu.status='paid' ORDER BY pu.created_at DESC`).all(req.user.id);
-  res.json({ products });
+  const member = db.prepare(`SELECT id FROM premium_memberships WHERE user_id=? AND status='active' AND datetime(expires_at)>datetime('now') LIMIT 1`).get(req.user.id);
+  const products = db.prepare(`SELECT p.id,p.slug,p.title,p.description,p.category,p.software,p.version,p.type,p.price_cents,p.thumbnail,p.preview,p.download_count,pu.created_at purchased_at
+    FROM purchases pu JOIN products p ON p.id=pu.product_id
+    WHERE pu.user_id=? AND pu.status='paid'
+    ${member ? "UNION SELECT p.id,p.slug,p.title,p.description,p.category,p.software,p.version,p.type,p.price_cents,p.thumbnail,p.preview,p.download_count,NULL purchased_at FROM products p WHERE p.active=1 AND p.type='premium'" : ""}
+    ORDER BY id DESC`).all(req.user.id);
+  res.json({ products, premium_active: !!member });
 });
 
 function isSafeStoredPath(value, allowedRoots) {
@@ -116,7 +137,7 @@ function isSafeStoredPath(value, allowedRoots) {
 }
 function deleteStoredFile(value) {
   if (!value) return;
-  const roots = [assetDir, mediaDir, path.join(publicDir, 'uploads')];
+  const roots = [assetDir, mediaDir, proofDir, path.join(publicDir, 'uploads')];
   if (isSafeStoredPath(value, roots)) fs.rmSync(path.resolve(value), { force: true });
 }
 
@@ -124,7 +145,8 @@ function downloadProduct(req, res) {
   const p = db.prepare('SELECT * FROM products WHERE id=? AND active=1').get(req.params.id);
   if (!p || !p.file_path) return res.status(404).json({ error: 'File unavailable. The creator has not uploaded the asset yet.' });
   const loggedIn = !!req.user;
-  const allowed = p.type === 'free' || (loggedIn && !!db.prepare("SELECT 1 FROM purchases WHERE user_id=? AND product_id=? AND status='paid'").get(req.user.id, p.id));
+  const membershipActive = loggedIn && !!getActiveMembership(req.user.id);
+  const allowed = p.type === 'free' || (loggedIn && (!!db.prepare("SELECT 1 FROM purchases WHERE user_id=? AND product_id=? AND status='paid'").get(req.user.id, p.id) || membershipActive));
   if (!allowed) return res.status(403).json({ error: 'Purchase required.' });
   const absolute = path.resolve(p.file_path);
   if (!isSafeStoredPath(absolute, [assetDir, path.join(publicDir, 'uploads')])) return res.status(403).json({ error: 'Invalid file location.' });
@@ -139,6 +161,53 @@ app.get('/api/products/:id/download', (req, res) => {
   if (!token) { req.user = null; return downloadProduct(req, res); }
   try { req.user = verifyToken(token); } catch { req.user = null; }
   downloadProduct(req, res);
+});
+
+// ---- Manual KBZ Pay Premium Membership ----
+const PREMIUM_MONTHLY_CENTS = 1000000; // 10,000 MMK = 1,000,000 cents in this app's integer money field.
+const PREMIUM_PAYMENT = { method: 'KBZ Pay', accountName: 'PaugPyinSang', phone: '0897185588' };
+const PREMIUM_PLANS = [1,2,3,4,5,6].map(months => ({ months, days: months * 30, amount_cents: PREMIUM_MONTHLY_CENTS * months }));
+
+function addDaysISO(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + Number(days || 0));
+  return d.toISOString();
+}
+function getActiveMembership(userId) {
+  return db.prepare(`SELECT * FROM premium_memberships WHERE user_id=? AND status='active' AND datetime(expires_at) > datetime('now') ORDER BY datetime(expires_at) DESC LIMIT 1`).get(userId);
+}
+function expireMemberships() {
+  db.prepare(`UPDATE premium_memberships SET status='expired' WHERE status='active' AND datetime(expires_at) <= datetime('now')`).run();
+}
+
+app.get('/api/premium/info', requireAuth, (req,res) => {
+  expireMemberships();
+  const membership = getActiveMembership(req.user.id);
+  res.json({ payment: PREMIUM_PAYMENT, plans: PREMIUM_PLANS, membership: membership ? {
+    id: membership.id, plan_months: membership.plan_months, starts_at: membership.starts_at, expires_at: membership.expires_at, status: membership.status
+  } : null });
+});
+
+app.post('/api/premium/request', requireAuth, proofUpload.single('screenshot'), (req,res) => {
+  const months = Number(req.body.plan_months);
+  const transactionId = String(req.body.transaction_id || '').trim();
+  const plan = PREMIUM_PLANS.find(x => x.months === months);
+  if (!plan) { if(req.file) deleteStoredFile(req.file.path); return res.status(400).json({error:'Invalid premium plan.'}); }
+  if (!/^\d{6}$/.test(transactionId)) { if(req.file) deleteStoredFile(req.file.path); return res.status(400).json({error:'Transaction No/ID ၏ နောက်ဆုံးဂဏန်း ၆ လုံးကိုသာ ထည့်ပေးပါ။'}); }
+  if (!req.file) return res.status(400).json({error:'Payment screenshot is required.'});
+  const pending = db.prepare(`SELECT id FROM payment_requests WHERE user_id=? AND status='pending' LIMIT 1`).get(req.user.id);
+  if (pending) { deleteStoredFile(req.file.path); return res.status(409).json({error:'You already have a payment waiting for admin verification.'}); }
+  const result = db.prepare(`INSERT INTO payment_requests(user_id,plan_months,amount_cents,payment_method,transaction_id,screenshot_path) VALUES(?,?,?,?,?,?)`).run(
+    req.user.id, months, plan.amount_cents, PREMIUM_PAYMENT.method, transactionId, path.resolve(req.file.path)
+  );
+  res.json({ok:true, request_id:result.lastInsertRowid, message:'Payment proof submitted. Please wait for admin verification.'});
+});
+
+app.get('/api/premium/status', requireAuth, (req,res) => {
+  expireMemberships();
+  const membership = getActiveMembership(req.user.id);
+  const pending = db.prepare(`SELECT id,plan_months,amount_cents,transaction_id,status,created_at FROM payment_requests WHERE user_id=? ORDER BY id DESC LIMIT 1`).get(req.user.id);
+  res.json({ active: !!membership, membership: membership ? {expires_at:membership.expires_at,plan_months:membership.plan_months} : null, pending: pending || null });
 });
 
 app.post('/api/checkout/:id', requireAuth, async (req, res) => {
@@ -274,6 +343,44 @@ app.post('/api/admin/products/:id/restore', requireAuth, requireAdmin, (req,res)
   const p = db.prepare('SELECT id FROM products WHERE id=?').get(req.params.id);
   if (!p) return res.status(404).json({error:'Product not found.'});
   db.prepare('UPDATE products SET active=1 WHERE id=?').run(req.params.id);
+  res.json({ok:true});
+});
+
+app.get('/api/admin/payments', requireAuth, requireAdmin, (req,res) => {
+  const rows = db.prepare(`SELECT pr.id,pr.plan_months,pr.amount_cents,pr.payment_method,pr.transaction_id,pr.screenshot_path,pr.status,pr.admin_note,pr.created_at,pr.reviewed_at,u.email,u.name FROM payment_requests pr JOIN users u ON u.id=pr.user_id ORDER BY CASE pr.status WHEN 'pending' THEN 0 ELSE 1 END, datetime(pr.created_at) DESC`).all();
+  res.json({payments: rows.map(x => ({...x, screenshot_url: x.screenshot_path ? '/api/admin/payments/'+x.id+'/proof' : ''}))});
+});
+app.get('/api/admin/payments/:id/proof', requireAuth, requireAdmin, (req,res) => {
+  const row = db.prepare('SELECT screenshot_path FROM payment_requests WHERE id=?').get(Number(req.params.id));
+  if (!row?.screenshot_path || !fs.existsSync(row.screenshot_path)) return res.status(404).send('Proof not found');
+  res.sendFile(path.resolve(row.screenshot_path));
+});
+app.post('/api/admin/payments/:id/approve', requireAuth, requireAdmin, (req,res) => {
+  const id = Number(req.params.id);
+  const row = db.prepare('SELECT * FROM payment_requests WHERE id=?').get(id);
+  if (!row) return res.status(404).json({error:'Payment request not found.'});
+  if (row.status !== 'pending') return res.status(400).json({error:'This request has already been reviewed.'});
+  const now = new Date();
+  const existing = getActiveMembership(row.user_id);
+  const start = existing && new Date(existing.expires_at) > now ? new Date(existing.expires_at) : now;
+  const expires = addDaysISO(start, row.plan_months * 30);
+  const tx = db.transaction(() => {
+    if (existing) {
+      db.prepare(`UPDATE premium_memberships SET expires_at=?, plan_months=plan_months+?, amount_cents=amount_cents+?, payment_request_id=? WHERE id=?`).run(expires,row.plan_months,row.amount_cents,id,existing.id);
+    } else {
+      db.prepare(`INSERT INTO premium_memberships(user_id,plan_months,amount_cents,starts_at,expires_at,status,payment_request_id) VALUES(?,?,?,?,?,'active',?)`).run(row.user_id,row.plan_months,row.amount_cents,now.toISOString(),expires,id);
+    }
+    db.prepare(`UPDATE payment_requests SET status='approved',reviewed_at=CURRENT_TIMESTAMP,reviewed_by=? WHERE id=?`).run(req.user.id,id);
+  });
+  tx();
+  res.json({ok:true,expires_at:expires});
+});
+app.post('/api/admin/payments/:id/reject', requireAuth, requireAdmin, (req,res) => {
+  const id = Number(req.params.id);
+  const row = db.prepare('SELECT * FROM payment_requests WHERE id=?').get(id);
+  if (!row) return res.status(404).json({error:'Payment request not found.'});
+  if (row.status !== 'pending') return res.status(400).json({error:'This request has already been reviewed.'});
+  db.prepare(`UPDATE payment_requests SET status='rejected',admin_note=?,reviewed_at=CURRENT_TIMESTAMP,reviewed_by=? WHERE id=?`).run(String(req.body.note||'').trim(),req.user.id,id);
   res.json({ok:true});
 });
 

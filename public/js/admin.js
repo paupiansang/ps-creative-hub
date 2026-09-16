@@ -86,11 +86,31 @@ window.restoreProduct = async id => {
   try { await api('/api/admin/products/'+id+'/restore',{method:'POST'}); await load(); }
   catch(err){ $('#adminMsg').textContent = err.message; }
 };
+async function loadPayments(){
+  const d=await api('/api/admin/payments');
+  const pending=d.payments.filter(x=>x.status==='pending');
+  $('#pendingPaymentCount').textContent=`${pending.length} pending`;
+  $('#adminPayments').innerHTML=d.payments.map(p=>{
+    const amount=(Number(p.amount_cents||0)/100).toLocaleString();
+    return `<article class="payment-request ${p.status}">
+      <div class="payment-main"><div class="payment-top"><strong>${esc(p.name||'User')}</strong><span class="payment-status ${p.status}">${esc(p.status)}</span></div>
+      <small>${esc(p.email)} · ${p.plan_months} month${p.plan_months>1?'s':''} · <b>${amount} MMK</b></small>
+      <div class="payment-tx">Transaction ID: <strong>${esc(p.transaction_id)}</strong></div>
+      <a class="proof-link" href="${esc(p.screenshot_url)}" target="_blank" rel="noopener">View payment screenshot ↗</a>
+      </div>
+      ${p.status==='pending'?`<div class="payment-actions"><button class="primary-btn small" onclick="approvePayment(${p.id})">Approve</button><button class="danger-btn" onclick="rejectPayment(${p.id})">Reject</button></div>`:''}
+    </article>`;
+  }).join('')||'<p class="muted">No payment requests yet.</p>';
+}
+window.approvePayment=async id=>{if(!confirm('Approve this payment and activate Premium access?'))return;try{await api('/api/admin/payments/'+id+'/approve',{method:'POST'});await loadPayments();await load()}catch(e){alert(e.message)}};
+window.rejectPayment=async id=>{const note=prompt('Optional reason for rejection:') ?? '';try{await api('/api/admin/payments/'+id+'/reject',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({note})});await loadPayments();await load()}catch(e){alert(e.message)}};
+
 async function load(){
   const s = await api('/api/admin/stats');
   $('#stats').innerHTML = [
     ['Users',s.users],['Products',s.products],['Purchases',s.purchases],['Downloads',s.downloads]
   ].map(x=>`<div class="stat"><span>${x[0]}</span><b>${x[1]}</b></div>`).join('');
+  await loadPayments();
   const d = await api('/api/admin/products');
   products = d.products;
   renderItems();

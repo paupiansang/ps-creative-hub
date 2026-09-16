@@ -49,6 +49,38 @@ CREATE TABLE IF NOT EXISTS purchases (
 );
 CREATE UNIQUE INDEX IF NOT EXISTS one_paid_product_per_user
 ON purchases(user_id, product_id) WHERE status='paid';
+
+CREATE TABLE IF NOT EXISTS premium_memberships (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  plan_months INTEGER NOT NULL DEFAULT 1,
+  amount_cents INTEGER NOT NULL DEFAULT 1000000,
+  starts_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  expires_at TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'active',
+  payment_request_id INTEGER,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+CREATE INDEX IF NOT EXISTS idx_membership_user_status ON premium_memberships(user_id,status,expires_at);
+CREATE TABLE IF NOT EXISTS payment_requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  plan_months INTEGER NOT NULL DEFAULT 1,
+  amount_cents INTEGER NOT NULL,
+  payment_method TEXT NOT NULL DEFAULT 'KBZ Pay',
+  transaction_id TEXT NOT NULL,
+  screenshot_path TEXT DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'pending',
+  admin_note TEXT DEFAULT '',
+  reviewed_at TEXT,
+  reviewed_by INTEGER,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(reviewed_by) REFERENCES users(id) ON DELETE SET NULL
+);
+CREATE INDEX IF NOT EXISTS idx_payment_requests_status ON payment_requests(status,created_at);
+
 CREATE TABLE IF NOT EXISTS downloads (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER,

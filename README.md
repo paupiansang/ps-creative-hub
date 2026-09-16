@@ -1,18 +1,26 @@
-# PS Creative Hub V7 — Clean Local Build
+# PS Creative Hub V7 — KBZ Pay Premium Build
 
-This is the clean standalone local build. Do not mix it with V1–V6.
+Clean V7 marketplace build with responsive UI and manual KBZ Pay Premium membership.
 
 ## Start
-1. Extract this ZIP to `C:\PS\PS\Website\PS-Creative-Hub-V7`.
-2. Double-click `START.bat`.
+1. Extract this ZIP to your V7 project folder.
+2. Run `START.bat`.
 3. Keep the black server window open.
 4. Open `http://localhost:3000`.
 
+## Premium payment flow
+- Premium membership uses **KBZ Pay only**.
+- Account name: **PaugPyinSang**
+- KBZ Pay number: **0897185588**
+- 1 month: **10,000 MMK**
+- 2–6 months: 20,000–60,000 MMK (10,000 MMK/month).
+- Customer chooses a plan, transfers the exact amount, enters Transaction ID, and uploads the payment screenshot.
+- Admin opens `/admin.html`, checks the proof, then clicks **Approve** or **Reject**.
+- Approval activates Premium access for all premium products for the selected duration.
+- If a customer already has active Premium, a newly approved payment extends the existing expiry date.
+
 ## Admin
-Open `http://localhost:3000/admin.html`. The first run creates the demo admin from `.env`.
+The first run creates the admin account from `.env`. Change the demo password before public use.
 
-## Local premium test
-`TEST_CHECKOUT=true` lets you test the premium purchase flow without real money. It creates a paid test purchase locally and unlocks My Library.
-
-## Production
-Before making the site public, turn off test checkout, configure Stripe, use HTTPS, production database/object storage, strong secrets, webhook verification, backups, and legal/license/refund pages.
+## Important production note
+This manual payment version does not automatically verify bank/KPay transactions. **Admin verification is required.** For a real public launch, use a persistent production database and persistent/object storage for uploaded product files and payment screenshots.
