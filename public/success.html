@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Purchase complete — PS Creative Hub</title><link rel="stylesheet" href="/css/styles.css"></head>
+<body><main class="success-page"><div class="success-card">
+<div class="success-icon">✓</div><div class="eyebrow" id="eyebrow">PURCHASE COMPLETE</div>
+<h1 id="title">You're in.</h1><p id="copy">Your premium asset is now available in My Library.</p>
+<div class="hero-actions"><a class="primary-btn" href="/library.html">Open My Library</a><a class="text-btn" href="/#store">Back to Store</a></div>
+</div></main>
+<script>
+const q=new URLSearchParams(location.search);
+if(q.get('test')==='1'){document.querySelector('#eyebrow').textContent='LOCAL TEST CHECKOUT';document.querySelector('#copy').textContent='Test purchase completed. No real money was charged. The premium asset is now in My Library.';}
+</script></body></html>
