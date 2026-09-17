@@ -146,18 +146,3 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
   .brand>span:last-child{font-size:14px}
   .ticker{gap:22px;padding:0 12px;font-size:7.5px}
 }
-
-
-/* V7 MOBILE FINAL — menu logout + ticker marquee */
-.mobile-menu-logout{display:none;border:0;background:none;color:var(--accent);font:inherit;font-weight:800;cursor:pointer;padding:6px 0;text-align:left}
-.ticker{position:relative;overflow:hidden;justify-content:flex-start}
-.ticker-track{display:flex;align-items:center;gap:52px;width:max-content;white-space:nowrap;animation:psTicker 24s linear infinite}
-.ticker-track span{flex:0 0 auto;white-space:nowrap}
-@keyframes psTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-@media(max-width:760px){
-  .menu-open .nav nav .mobile-menu-logout{display:block}
-  .menu-open .nav nav{align-items:flex-start;flex-direction:column}
-  .ticker{justify-content:flex-start}
-  .ticker-track{gap:30px;animation-duration:18s}
-}
-@media(prefers-reduced-motion:reduce){.ticker-track{animation:none}}

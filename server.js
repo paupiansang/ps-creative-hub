@@ -164,9 +164,9 @@ app.get('/api/products/:id/download', (req, res) => {
 });
 
 // ---- Manual KBZ Pay Premium Membership ----
-const PREMIUM_MONTHLY_CENTS = 1000000; // 10,000 MMK = 1,000,000 cents in this app's integer money field.
+const PREMIUM_YEAR_AMOUNT_CENTS = 1500000; // 15,000 MMK for 1 year (365 days).
 const PREMIUM_PAYMENT = { method: 'KBZ Pay', accountName: 'PaugPyinSang', phone: '0897185588' };
-const PREMIUM_PLANS = [1,2,3,4,5,6].map(months => ({ months, days: months * 30, amount_cents: PREMIUM_MONTHLY_CENTS * months }));
+const PREMIUM_PLANS = [{ months: 12, days: 365, amount_cents: PREMIUM_YEAR_AMOUNT_CENTS }];
 
 function addDaysISO(date, days) {
   const d = new Date(date);
@@ -363,7 +363,7 @@ app.post('/api/admin/payments/:id/approve', requireAuth, requireAdmin, (req,res)
   const now = new Date();
   const existing = getActiveMembership(row.user_id);
   const start = existing && new Date(existing.expires_at) > now ? new Date(existing.expires_at) : now;
-  const expires = addDaysISO(start, row.plan_months * 30);
+  const expires = addDaysISO(start, row.plan_months === 12 ? 365 : row.plan_months * 30);
   const tx = db.transaction(() => {
     if (existing) {
       db.prepare(`UPDATE premium_memberships SET expires_at=?, plan_months=plan_months+?, amount_cents=amount_cents+?, payment_request_id=? WHERE id=?`).run(expires,row.plan_months,row.amount_cents,id,existing.id);

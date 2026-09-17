@@ -21,6 +21,15 @@ const { hashPassword } = require("./auth");
   for(const x of products){
     db.prepare(`INSERT OR IGNORE INTO products(slug,title,description,category,software,version,type,price_cents) VALUES(?,?,?,?,?,?,?,?)`).run(...x);
   }
+  const thumbnailMap = {
+    "ps-hover-scale-toolkit": "/assets/thumbs/ps-hover-scale-toolkit.svg",
+    "ps-countdown-kit": "/assets/thumbs/ps-countdown-kit.svg",
+    "ps-text-toolkit": "/assets/thumbs/ps-text-toolkit.svg",
+    "cinematic-whoosh-pack": "/assets/thumbs/cinematic-whoosh-pack.svg"
+  };
+  for (const [slug, thumbnail] of Object.entries(thumbnailMap)) {
+    db.prepare("UPDATE products SET thumbnail=? WHERE slug=? AND (thumbnail IS NULL OR thumbnail='')").run(thumbnail, slug);
+  }
   // Auto-link tracked assets in storage/assets to products so Render can serve
   // files committed to GitHub even when the product was seeded without an upload.
   const assetDir = path.join(__dirname, "storage", "assets");

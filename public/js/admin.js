@@ -94,7 +94,7 @@ async function loadPayments(){
     const amount=(Number(p.amount_cents||0)/100).toLocaleString();
     return `<article class="payment-request ${p.status}">
       <div class="payment-main"><div class="payment-top"><strong>${esc(p.name||'User')}</strong><span class="payment-status ${p.status}">${esc(p.status)}</span></div>
-      <small>${esc(p.email)} · ${p.plan_months} month${p.plan_months>1?'s':''} · <b>${amount} MMK</b></small>
+      <small>${esc(p.email)} · ${p.plan_months===12?'1 year':p.plan_months+' months'} · <b>${amount} MMK</b></small>
       <div class="payment-tx">Transaction ID: <strong>${esc(p.transaction_id)}</strong></div>
       <a class="proof-link" href="${esc(p.screenshot_url)}" target="_blank" rel="noopener">View payment screenshot ↗</a>
       </div>
