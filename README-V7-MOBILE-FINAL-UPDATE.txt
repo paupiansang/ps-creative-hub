@@ -11,7 +11,7 @@ Updated:
   PS CREATIVE HUB / AFTER EFFECTS / PREMIERE PRO / PHOTOSHOP / AI WORKFLOW / STOCK ASSETS
 - Reduced-motion preference is respected.
 
-Premium: 15,000 MMK / 365 days (1 year).
+Premium: 30,000 MMK / 365 days (1 year).
 
 IMPORTANT:
 Keep existing data and storage/assets. Start with START.bat or RUN_SERVER.bat.

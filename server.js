@@ -164,7 +164,7 @@ app.get('/api/products/:id/download', (req, res) => {
 });
 
 // ---- Manual KBZ Pay Premium Membership ----
-const PREMIUM_YEAR_AMOUNT_CENTS = 1500000; // 15,000 MMK for 1 year (365 days).
+const PREMIUM_YEAR_AMOUNT_CENTS = 3000000; // 30,000 MMK for 1 year (365 days).
 const PREMIUM_PAYMENT = { method: 'KBZ Pay', accountName: 'PaugPyinSang', phone: '0897185588' };
 const PREMIUM_PLANS = [{ months: 12, days: 365, amount_cents: PREMIUM_YEAR_AMOUNT_CENTS }];
 

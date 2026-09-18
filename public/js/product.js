@@ -13,7 +13,7 @@ async function run(){
  <div class="detail-meta"><span class="tag ${premium?'premium':''}">${premium?'Premium':'Free'}</span><span class="pill">${esc(p.version||'Latest')}</span><span class="pill">${p.download_count} downloads</span></div>
  <div class="detail-price">${premium?'Premium Membership':'Free'}</div>
  <button id="action" class="primary-btn large">${premium?'Get Premium Access':'Download free'}</button>
- <p class="muted" style="margin-top:18px">${premium?'Premium access is 15,000 MMK for 1 year (365 days).':'No purchase required. The download starts immediately when a file is available.'}</p>
+ <p class="muted" style="margin-top:18px">${premium?'Premium access is 30,000 MMK for 1 year (365 days).':'No purchase required. The download starts immediately when a file is available.'}</p>
  </div>`;
  $('#action').addEventListener('click',()=>premium?location.href='/premium.html?product='+encodeURIComponent(p.slug):download(p.id));
 }
