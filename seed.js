@@ -34,6 +34,8 @@ const { hashPassword } = require("./auth");
 
   // --------------------------------------------------
   // PRODUCTS
+  // Premium products are membership-only.
+  // No individual product pricing.
   // --------------------------------------------------
   const products = [
     [
@@ -55,7 +57,7 @@ const { hashPassword } = require("./auth");
       "AE",
       "V1",
       "premium",
-      500
+      0
     ],
 
     [
@@ -66,7 +68,7 @@ const { hashPassword } = require("./auth");
       "AE",
       "V1",
       "premium",
-      700
+      0
     ],
 
     [
@@ -98,14 +100,23 @@ const { hashPassword } = require("./auth");
   }
 
   // --------------------------------------------------
-  // FORCE UPLOADED THUMBNAILS
+  // FORCE MEMBERSHIP-ONLY PRODUCT PRICING
   // --------------------------------------------------
+  // Premium membership is handled separately:
+  // 30,000 MMK / 365 days
   //
-  // These files are committed to:
-  // public/uploads/media/
-  //
-  // So Render can serve them after deploy.
-  //
+  // Therefore every product itself has no individual
+  // purchase price.
+  // --------------------------------------------------
+  db.prepare(`
+    UPDATE products
+    SET price_cents = 0
+    WHERE type IN ('free', 'premium')
+  `).run();
+
+  // --------------------------------------------------
+  // UPLOADED THUMBNAILS
+  // --------------------------------------------------
   const thumbnailMap = {
     "ps-hover-scale-toolkit":
       "/uploads/media/1789656467624-qamtjg-mouse-cursor.png",
@@ -155,11 +166,6 @@ const { hashPassword } = require("./auth");
     {
       slug: "ps-text-toolkit",
       match: "PS_Path_Toolkit_V2_CLEAN"
-    },
-
-    {
-      slug: "ps-text-toolkit",
-      match: "PS_PillText_Toolkit_V9_FINAL"
     }
   ];
 
@@ -196,7 +202,7 @@ const { hashPassword } = require("./auth");
   }
 
   console.log(
-    "PS Creative Hub V7 seed complete. Admin:",
+    "PS Creative Hub V7 seed complete. Premium = Membership only. 30,000 MMK / 365 days. Admin:",
     adminEmail
   );
 })();
