@@ -18,18 +18,35 @@ function esc(s) {
 }
 
 function buildVisual(p) {
-  const poster = p.thumbnail ? ` poster="${esc(p.thumbnail)}"` : "";
+  const mediaBoxStyle = `
+    width:100%;
+    aspect-ratio:16 / 9;
+    border-radius:18px;
+    overflow:hidden;
+    background:#08091A;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 12px 35px rgba(0,0,0,.16);
+  `;
 
-  // Uploaded preview video or Preview video URL
+  const mediaStyle = `
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center;
+    background:#08091A;
+  `;
+
+  // Preview video
   if (p.preview) {
+    const poster = p.thumbnail
+      ? ` poster="${esc(p.thumbnail)}"`
+      : "";
+
     return `
-      <div class="detail-video-wrap" style="
-        width:100%;
-        border-radius:18px;
-        overflow:hidden;
-        background:#08091A;
-        box-shadow:0 12px 35px rgba(0,0,0,.16);
-      ">
+      <div class="detail-video-wrap" style="${mediaBoxStyle}">
         <video
           src="${esc(p.preview)}"
           ${poster}
@@ -39,14 +56,7 @@ function buildVisual(p) {
           loop
           playsinline
           preload="metadata"
-          style="
-            display:block;
-            width:100%;
-            height:auto;
-            max-height:560px;
-            object-fit:contain;
-            background:#08091A;
-          "
+          style="${mediaStyle}"
         >
           Your browser does not support video playback.
         </video>
@@ -54,32 +64,36 @@ function buildVisual(p) {
     `;
   }
 
-  // Thumbnail fallback when no preview video exists
+  // Thumbnail
   if (p.thumbnail) {
     return `
-      <div class="detail-image-wrap" style="
-        width:100%;
-        border-radius:18px;
-        overflow:hidden;
-        background:#08091A;
-        box-shadow:0 12px 35px rgba(0,0,0,.16);
-      ">
+      <div class="detail-image-wrap" style="${mediaBoxStyle}">
         <img
           src="${esc(p.thumbnail)}"
           alt="${esc(p.title)}"
-          style="
-            display:block;
-            width:100%;
-            height:auto;
-            max-height:560px;
-            object-fit:contain;
-          "
+          style="${mediaStyle}"
         >
       </div>
     `;
   }
 
-  return `<div class="thumb-mark">PS</div>`;
+  // Fallback
+  return `
+    <div
+      class="thumb-mark"
+      style="
+        width:100%;
+        aspect-ratio:16 / 9;
+        border-radius:18px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        background:#08091A;
+      "
+    >
+      PS
+    </div>
+  `;
 }
 
 async function run() {
@@ -93,7 +107,6 @@ async function run() {
     await api("/api/products/" + encodeURIComponent(slug));
 
   const premium = p.type === "premium";
-
   const visual = buildVisual(p);
 
   const previewNote = p.preview
@@ -206,7 +219,6 @@ async function buy(id) {
     }
 
     location.href = d.url;
-
   } catch (e) {
     if (
       e.message.includes("Login required") ||
